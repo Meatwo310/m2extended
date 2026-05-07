@@ -3,6 +3,6 @@ displayName: "m2extended"
 author: "Meatwo310"
 description: "A collection mod of QoL content that expands vanilla gameplay."
 version: "0.1.0"
-minGameVersion: "146"
+minGameVersion: "154"
 dependencies: []
 hidden: false
