@@ -1,0 +1,8 @@
+name: cheap-armored-conveyor
+displayName: "Cheap Armored Conveyor"
+author: "TODO"
+description: "Adds a cheaper armored conveyor variant."
+version: "0.1.0"
+minGameVersion: "146"
+dependencies: []
+hidden: false

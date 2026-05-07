@@ -1,0 +1,6 @@
+*.zip
+*.jar
+build/
+out/
+.DS_Store
+Thumbs.db
