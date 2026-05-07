@@ -1,7 +1,7 @@
-name: cheap-armored-conveyor
-displayName: "Cheap Armored Conveyor"
-author: "TODO"
-description: "Adds a cheaper armored conveyor variant."
+name: m2extended
+displayName: "m2extended"
+author: "Meatwo310"
+description: "A collection mod of QoL content that expands vanilla gameplay."
 version: "0.1.0"
 minGameVersion: "146"
 dependencies: []
