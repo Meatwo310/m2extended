@@ -1,0 +1,25 @@
+type: ArmoredConveyor
+localizedName: "Silicon Armored Conveyor"
+description: "A fast armored conveyor that rejects non-conveyor side input."
+category: distribution
+
+requirements: [
+  copper/1
+  lead/1
+  titanium/1
+  silicon/1
+]
+
+health: 90
+speed: 0.08
+displayedSpeed: 11
+
+research: {
+  parent: titanium-conveyor
+  requirements: [
+    copper/80
+    lead/80
+    titanium/80
+    silicon/80
+  ]
+}

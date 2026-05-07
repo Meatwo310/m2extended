@@ -1,0 +1,22 @@
+type: ArmoredConveyor
+localizedName: "Lead Armored Conveyor"
+description: "A basic armored conveyor that rejects non-conveyor side input."
+category: distribution
+
+requirements: [
+  copper/1
+  lead/1
+]
+
+health: 65
+speed: 0.03
+displayedSpeed: 4.2
+buildCostMultiplier: 2
+
+research: {
+  parent: conveyor
+  requirements: [
+    copper/5
+    lead/20
+  ]
+}
