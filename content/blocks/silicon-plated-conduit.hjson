@@ -1,0 +1,25 @@
+type: ArmoredConduit
+name: "Silicon Plated Conduit"
+description: "Moves liquids at the same speed as a pulse conduit. Rejects side input from non-conduits and does not leak."
+category: liquid
+
+requirements: [
+  titanium/2
+  metaglass/1
+  silicon/1
+]
+
+liquidCapacity: 40
+liquidPressure: 1.025
+health: 90
+explosivenessScale: 0.4
+flammabilityScale: 0.4
+
+research: {
+  parent: pulse-conduit
+  requirements: [
+    titanium/80
+    metaglass/80
+    silicon/80
+  ]
+}
