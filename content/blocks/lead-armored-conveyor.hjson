@@ -19,4 +19,10 @@ research: {
     copper/5
     lead/20
   ]
+  objectives: [
+    {
+      type: SectorComplete
+      preset: groundZero
+    }
+  ]
 }
