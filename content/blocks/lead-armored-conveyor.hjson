@@ -1,6 +1,6 @@
 type: ArmoredConveyor
 name: "Lead Armored Conveyor"
-description: "A basic armored conveyor that rejects non-conveyor side input."
+description: "A cheap armored conveyor that rejects side input from non-conveyors."
 category: distribution
 
 requirements: [
@@ -8,7 +8,7 @@ requirements: [
   lead/1
 ]
 
-health: 65
+health: 45
 speed: 0.03
 displayedSpeed: 4.2
 buildCostMultiplier: 2

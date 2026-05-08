@@ -1,6 +1,6 @@
 type: ArmoredConveyor
 name: "Silicon Armored Conveyor"
-description: "A fast armored conveyor that rejects non-conveyor side input."
+description: "Moves items at the same speed as a titanium conveyor. Rejects side input from non-conveyors."
 category: distribution
 
 requirements: [
@@ -10,7 +10,7 @@ requirements: [
   silicon/1
 ]
 
-health: 90
+health: 65
 speed: 0.08
 displayedSpeed: 11
 
