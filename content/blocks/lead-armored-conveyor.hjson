@@ -1,5 +1,5 @@
 type: ArmoredConveyor
-localizedName: "Lead Armored Conveyor"
+name: "Lead Armored Conveyor"
 description: "A basic armored conveyor that rejects non-conveyor side input."
 category: distribution
 

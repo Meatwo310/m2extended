@@ -1,5 +1,5 @@
 type: ArmoredConveyor
-localizedName: "Silicon Armored Conveyor"
+name: "Silicon Armored Conveyor"
 description: "A fast armored conveyor that rejects non-conveyor side input."
 category: distribution
 
