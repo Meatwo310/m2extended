@@ -1,16 +1,68 @@
 # m2extended
 
-JSON/HJSON Mindustry mod that adds a collection of QoL content expanding vanilla gameplay.
+m2extended is a JSON/HJSON content mod for Mindustry that adds small
+quality-of-life logistics blocks while staying close to vanilla progression.
 
-Metadata values in `mod.hjson` are provisional and should be confirmed before content is finalized.
+## Requirements
+
+- Mindustry `154` or later
+- No mod dependencies
+
+## Content
+
+### Distribution
+
+| Block | Unlock | Build cost | Notes |
+| --- | --- | --- | --- |
+| Lead Armored Conveyor | Conveyor, after Ground Zero | `copper/1`, `lead/1` | Cheap armored conveyor that rejects side input from non-conveyors. |
+| Silicon Armored Conveyor | Titanium Conveyor | `copper/1`, `lead/1`, `titanium/1`, `silicon/1` | Armored conveyor with titanium conveyor speed. |
+
+### Liquid
+
+| Block | Unlock | Build cost | Notes |
+| --- | --- | --- | --- |
+| Lead Plated Conduit | Conduit | `metaglass/1`, `lead/1` | Cheap plated conduit that rejects side input from non-conduits and does not leak. |
+| Silicon Plated Conduit | Pulse Conduit | `titanium/2`, `metaglass/1`, `silicon/1` | Plated conduit with pulse conduit pressure and higher liquid capacity. |
+
+Japanese names and descriptions are provided in
+`bundles/bundle_ja.properties`.
+
+## Repository Layout
+
+- `mod.hjson` - Mindustry mod metadata.
+- `content/blocks/` - JSON/HJSON block definitions.
+- `sprites/blocks/` - block sprites used by the content definitions.
+- `bundles/` - localization bundles.
+- `.github/workflows/build.yml` - packages the mod on pushes to `main` and
+  manual workflow runs.
+- `.github/workflows/release.yml` - creates tagged GitHub releases from the
+  packaged mod.
+
+## Local Packaging
+
+The mod is distributed as a zip containing the metadata, content, sprites,
+bundles, and README:
+
+```sh
+mkdir -p dist
+zip -r dist/m2extended.zip mod.hjson README.md content sprites bundles
+```
+
+Install the zip through Mindustry's mod import menu, or place the unpacked
+repository in the Mindustry mods directory while developing.
 
 ## Release
 
-Releases are created semi-automatically from GitHub Actions.
+Releases are created from GitHub Actions.
 
-1. Update `version` in `mod.hjson` and merge the change into `main`.
-2. Open **Actions > Release Mod > Run workflow** on the `main` branch.
-3. Leave `version` empty to use `mod.hjson`, or enter the same version explicitly.
-4. Keep `draft` enabled to review the generated release before publishing.
+1. Update `version` in `mod.hjson`.
+2. Merge the version change into `main`.
+3. Open **Actions > Release Mod > Run workflow** on the `main` branch.
+4. Leave `version` empty to use the value from `mod.hjson`, or enter the same
+   semantic version explicitly.
+5. Keep `draft` enabled when you want to inspect the generated release before
+   publishing.
 
-The workflow packages the mod as `m2extended-vX.Y.Z.zip`, creates tag `vX.Y.Z`, and attaches the zip to the GitHub Release.
+The workflow validates that the requested version matches `mod.hjson`, creates
+tag `vX.Y.Z`, packages `m2extended-vX.Y.Z.zip`, and attaches it to the GitHub
+Release.
