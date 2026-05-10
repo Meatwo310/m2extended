@@ -1,7 +1,7 @@
 # m2extended
 
-m2extended is a JSON/HJSON content mod for Mindustry that adds small
-quality-of-life logistics blocks while staying close to vanilla progression.
+m2extended is a Java content mod for Mindustry that adds small quality-of-life
+logistics blocks while staying close to vanilla progression.
 
 ## Requirements
 
@@ -29,8 +29,8 @@ Japanese names and descriptions are provided in
 
 ## Repository Layout
 
-- `mod.hjson` - Mindustry mod metadata.
-- `content/blocks/` - JSON/HJSON block definitions.
+- `mod.hjson` - Mindustry mod metadata and Java entrypoint.
+- `src/` - Java content definitions.
 - `sprites/blocks/` - block sprites used by the content definitions.
 - `bundles/` - localization bundles.
 - `.github/workflows/build.yml` - packages the mod on pushes to `main` and
@@ -40,16 +40,14 @@ Japanese names and descriptions are provided in
 
 ## Local Packaging
 
-The mod is distributed as a zip containing the metadata, content, sprites,
-bundles, and README:
+The mod is distributed as a jar built by Gradle:
 
 ```sh
-mkdir -p dist
-zip -r dist/m2extended.zip mod.hjson README.md content sprites bundles
+./gradlew jar
 ```
 
-Install the zip through Mindustry's mod import menu, or place the unpacked
-repository in the Mindustry mods directory while developing.
+Install `build/libs/m2extendedDesktop.jar` through Mindustry's mod import menu,
+or place it in the Mindustry mods directory while developing.
 
 ## Release
 
@@ -64,5 +62,5 @@ Releases are created from GitHub Actions.
    publishing.
 
 The workflow validates that the requested version matches `mod.hjson`, creates
-tag `vX.Y.Z`, packages `m2extended-vX.Y.Z.zip`, and attaches it to the GitHub
-Release.
+tag `vX.Y.Z`, builds `m2extendedDesktop.jar`, renames it to
+`m2extended-vX.Y.Z.jar`, and attaches it to the GitHub Release.

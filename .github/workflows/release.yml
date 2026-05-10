@@ -66,7 +66,7 @@ jobs:
           {
             echo "version=$release_version"
             echo "tag=v$release_version"
-            echo "asset=m2extended-v$release_version.zip"
+            echo "asset=m2extended-v$release_version.jar"
           } >> "$GITHUB_OUTPUT"
 
       - name: Validate release target
@@ -89,13 +89,20 @@ jobs:
             exit 1
           fi
 
-      - name: Package mod
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build mod
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p dist
-          zip -r "dist/${{ steps.version.outputs.asset }}" mod.hjson README.md content sprites bundles
-          unzip -l "dist/${{ steps.version.outputs.asset }}"
+          chmod +x ./gradlew
+          ./gradlew jar
+          cp build/libs/m2extendedDesktop.jar "dist/${{ steps.version.outputs.asset }}"
 
       - name: Create GitHub Release
         env:
