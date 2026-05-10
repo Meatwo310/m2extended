@@ -33,10 +33,8 @@ Japanese names and descriptions are provided in
 - `src/` - Java content definitions.
 - `sprites/blocks/` - block sprites used by the content definitions.
 - `bundles/` - localization bundles.
-- `.github/workflows/build.yml` - packages the mod on pushes to `main` and
-  manual workflow runs.
-- `.github/workflows/release.yml` - creates tagged GitHub releases from the
-  packaged mod.
+- `.github/workflows/commitTest.yml` - builds the deploy jar on pushes and pull
+  requests, and creates GitHub Releases from `v*` tag pushes.
 
 ## Local Packaging
 
@@ -51,16 +49,12 @@ or place it in the Mindustry mods directory while developing.
 
 ## Release
 
-Releases are created from GitHub Actions.
+Releases are created by pushing version tags.
 
 1. Update `version` in `mod.hjson`.
 2. Merge the version change into `main`.
-3. Open **Actions > Release Mod > Run workflow** on the `main` branch.
-4. Leave `version` empty to use the value from `mod.hjson`, or enter the same
-   semantic version explicitly.
-5. Keep `draft` enabled when you want to inspect the generated release before
-   publishing.
+3. Create and push a matching tag, for example `v0.1.1`.
 
-The workflow validates that the requested version matches `mod.hjson`, creates
-tag `vX.Y.Z`, builds `m2extendedDesktop.jar`, renames it to
-`m2extended-vX.Y.Z.jar`, and attaches it to the GitHub Release.
+On `v*` tag pushes, `commitTest.yml` validates that the tag version matches
+`mod.hjson`, builds `build/libs/m2extended.jar`, and attaches that jar to the
+GitHub Release.
