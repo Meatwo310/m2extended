@@ -54,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ github.event.repository.name }}
-          path: build/libs/${{ github.event.repository.name }}.jar
+          path: build/libs/${{ github.event.repository.name }}-*.jar
 
   release:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
@@ -78,10 +78,17 @@ jobs:
           set -euo pipefail
 
           tag_version="${GITHUB_REF_NAME#v}"
-          mod_version="$(sed -nE 's/^[[:space:]]*version:[[:space:]]*"?([^"#,]+)"?.*$/\1/p' mod.hjson | head -n 1 | tr -d '\r' | xargs)"
+          asset="$(find build/libs -maxdepth 1 -type f -name '${{ github.event.repository.name }}-*.jar' | head -n 1)"
+
+          if [ -z "$asset" ]; then
+            echo "No versioned jar found in build/libs." >&2
+            exit 1
+          fi
+
+          mod_version="$(unzip -p "$asset" mod.hjson | sed -nE 's/^[[:space:]]*version:[[:space:]]*"?([^"#,]+)"?.*$/\1/p' | head -n 1 | tr -d '\r' | xargs)"
 
           if [ -z "$mod_version" ]; then
-            echo "mod.hjson does not contain a version value." >&2
+            echo "$asset does not contain a generated mod.hjson version value." >&2
             exit 1
           fi
 
@@ -97,7 +104,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          asset="build/libs/${{ github.event.repository.name }}.jar"
+          asset="$(find build/libs -maxdepth 1 -type f -name '${{ github.event.repository.name }}-*.jar' | head -n 1)"
+
+          if [ -z "$asset" ]; then
+            echo "No versioned jar found in build/libs." >&2
+            exit 1
+          fi
 
           gh release create "${GITHUB_REF_NAME}" "$asset" \
             --target "${GITHUB_SHA}" \

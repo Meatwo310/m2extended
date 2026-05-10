@@ -29,7 +29,8 @@ Japanese names and descriptions are provided in
 
 ## Repository Layout
 
-- `mod.hjson` - Mindustry mod metadata and Java entrypoint.
+- `template.mod.hjson` - Mindustry mod metadata template.
+- `build/generated/modMetadata/mod.hjson` - generated Mindustry mod metadata.
 - `src/` - Java content definitions.
 - `sprites/blocks/` - block sprites used by the content definitions.
 - `bundles/` - localization bundles.
@@ -51,10 +52,10 @@ or place it in the Mindustry mods directory while developing.
 
 Releases are created by pushing version tags.
 
-1. Update `version` in `mod.hjson`.
+1. Update `version` in `build.gradle.kts`.
 2. Merge the version change into `main`.
 3. Create and push a matching tag, for example `v0.1.1`.
 
 On `v*` tag pushes, `commitTest.yml` validates that the tag version matches
-`mod.hjson`, builds `build/libs/m2extended.jar`, and attaches that jar to the
-GitHub Release.
+the generated `mod.hjson`, builds `build/libs/m2extended-<version>.jar`, and
+attaches that jar to the GitHub Release.

@@ -1,10 +1,10 @@
-name: m2extended
+name: ${modName}
 displayName: "m2extended"
 author: "Meatwo310"
 main: "m2extended.M2ExtendedMod"
 description: "A collection mod of QoL content that expands vanilla gameplay."
-version: "1.0.0"
-minGameVersion: "157"
+version: "${modVersion}"
+minGameVersion: "${minGameVersion}"
 dependencies: []
 hidden: false
 java: true

@@ -54,12 +54,14 @@ java {
 }
 
 val mindustryVersion = "v157"
+val minGameVersion = mindustryVersion.removePrefix("v")
 val isWindows = System.getProperty("os.name").lowercase().contains("windows")
 val sdkRoot: String? = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 val mindustryClientJar: String? = providers.gradleProperty("mindustryClientJar").orNull
 val mindustryClientUrl = providers.gradleProperty("mindustryClientUrl")
     .orElse("https://github.com/Anuken/Mindustry/releases/download/$mindustryVersion/Mindustry.jar")
 val downloadedMindustryClient = layout.buildDirectory.file("mindustry/Mindustry-$mindustryVersion.jar")
+val generatedModMetadataDir = layout.buildDirectory.dir("generated/modMetadata")
 
 allprojects {
     tasks.withType<JavaCompile>().configureEach {
@@ -70,6 +72,21 @@ allprojects {
 dependencies {
     compileOnly("Anuken:Mindustry:$mindustryVersion")
     annotationProcessor("Anuken:jabel:v1.0.0")
+}
+
+val generateModHjson by tasks.registering(Copy::class) {
+    from("template.mod.hjson")
+    into(generatedModMetadataDir)
+    rename("template.mod.hjson", "mod.hjson")
+    filteringCharset = "UTF-8"
+    expand(
+        "modName" to project.name,
+        "modVersion" to project.version.toString(),
+        "minGameVersion" to minGameVersion
+    )
+    inputs.property("modName", project.name)
+    inputs.property("modVersion", project.version.toString())
+    inputs.property("minGameVersion", minGameVersion)
 }
 
 tasks.register("jarAndroid") {
@@ -115,6 +132,7 @@ tasks.register("jarAndroid") {
 
 tasks.jar {
     archiveFileName.set("${project.name}Desktop.jar")
+    dependsOn(generateModHjson)
 
     from({
         configurations.runtimeClasspath.get().map {
@@ -122,8 +140,9 @@ tasks.jar {
         }
     })
 
+    from(generateModHjson)
+
     from(projectDir) {
-        include("mod.hjson")
         include("sprites/**")
         include("bundles/**")
     }
@@ -132,7 +151,7 @@ tasks.jar {
 tasks.register<Jar>("deploy") {
     dependsOn("jarAndroid")
     dependsOn("jar")
-    archiveFileName.set("${project.name}.jar")
+    archiveBaseName.set(project.name)
 
     from({
         listOf(
