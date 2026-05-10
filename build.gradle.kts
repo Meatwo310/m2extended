@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.jvm.tasks.Jar
+import java.net.URI
 
 plugins {
     java
@@ -56,6 +57,9 @@ val mindustryVersion = "v157"
 val isWindows = System.getProperty("os.name").lowercase().contains("windows")
 val sdkRoot: String? = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 val mindustryClientJar: String? = providers.gradleProperty("mindustryClientJar").orNull
+val mindustryClientUrl = providers.gradleProperty("mindustryClientUrl")
+    .orElse("https://github.com/Anuken/Mindustry/releases/download/$mindustryVersion/Mindustry.jar")
+val downloadedMindustryClient = layout.buildDirectory.file("mindustry/Mindustry-$mindustryVersion.jar")
 
 allprojects {
     tasks.withType<JavaCompile>().configureEach {
@@ -143,13 +147,13 @@ tasks.register<Jar>("deploy") {
 }
 
 tasks.register("runClient") {
-    dependsOn("jar")
+    dependsOn("jar", "downloadMindustryClient")
     group = "mindustry"
     description = "Runs Mindustry with this mod installed into the local run directory."
 
     doLast {
         val clientJar = mindustryClientJar?.let(::File)
-            ?: throw GradleException("Set -PmindustryClientJar=/path/to/Mindustry.jar")
+            ?: downloadedMindustryClient.get().asFile
 
         if (!clientJar.isFile) {
             throw GradleException("Mindustry client jar does not exist: ${clientJar.absolutePath}")
@@ -177,6 +181,24 @@ tasks.register("runClient") {
         val exitCode = process.waitFor()
         if (exitCode != 0) {
             throw GradleException("Mindustry exited with code $exitCode.")
+        }
+    }
+}
+
+tasks.register("downloadMindustryClient") {
+    group = "mindustry"
+    description = "Downloads the Mindustry client jar used by runClient."
+    outputs.file(downloadedMindustryClient)
+    onlyIf { mindustryClientJar == null && !downloadedMindustryClient.get().asFile.isFile }
+
+    doLast {
+        val output = downloadedMindustryClient.get().asFile
+        output.parentFile.mkdirs()
+
+        URI(mindustryClientUrl.get()).toURL().openStream().use { input ->
+            output.outputStream().use { outputStream ->
+                input.copyTo(outputStream)
+            }
         }
     }
 }
