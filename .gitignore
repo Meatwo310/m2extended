@@ -1,6 +1,10 @@
 *.zip
 *.jar
+.gradle/
 build/
 out/
 .DS_Store
 Thumbs.db
+
+/.idea/
+/run/

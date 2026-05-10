@@ -1,8 +1,10 @@
 name: m2extended
 displayName: "m2extended"
 author: "Meatwo310"
+main: "m2extended.M2ExtendedMod"
 description: "A collection mod of QoL content that expands vanilla gameplay."
 version: "0.1.1"
-minGameVersion: "154"
+minGameVersion: "157"
 dependencies: []
 hidden: false
+java: true
