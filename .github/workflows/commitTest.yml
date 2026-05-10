@@ -23,7 +23,14 @@ jobs:
         run: |
           set -euo pipefail
 
-          build_tools_dir="$(find "${ANDROID_HOME}/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          android_sdk_root="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+
+          if [ -z "$android_sdk_root" ]; then
+            echo "Neither ANDROID_HOME nor ANDROID_SDK_ROOT is set." >&2
+            exit 1
+          fi
+
+          build_tools_dir="$(find "${android_sdk_root}/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
 
           if [ -z "$build_tools_dir" ]; then
             echo "No Android build-tools directory found." >&2
