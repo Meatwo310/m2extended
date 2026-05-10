@@ -55,6 +55,7 @@ java {
 val mindustryVersion = "v157"
 val isWindows = System.getProperty("os.name").lowercase().contains("windows")
 val sdkRoot: String? = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
+val mindustryClientJar: String? = providers.gradleProperty("mindustryClientJar").orNull
 
 allprojects {
     tasks.withType<JavaCompile>().configureEach {
@@ -138,5 +139,44 @@ tasks.register<Jar>("deploy") {
 
     doLast {
         delete("build/libs/${project.name}Android.jar")
+    }
+}
+
+tasks.register("runClient") {
+    dependsOn("jar")
+    group = "mindustry"
+    description = "Runs Mindustry with this mod installed into the local run directory."
+
+    doLast {
+        val clientJar = mindustryClientJar?.let(::File)
+            ?: throw GradleException("Set -PmindustryClientJar=/path/to/Mindustry.jar")
+
+        if (!clientJar.isFile) {
+            throw GradleException("Mindustry client jar does not exist: ${clientJar.absolutePath}")
+        }
+
+        val runDir = layout.projectDirectory.dir("run").asFile
+        val modsDir = File(runDir, "mods")
+
+        copy {
+            from(tasks.jar.flatMap { it.archiveFile })
+            into(modsDir)
+        }
+
+        val process = ProcessBuilder(
+            "java",
+            "-Dmindustry.data.dir=${runDir.absolutePath}",
+            "-Dnodiscord=true",
+            "-jar",
+            clientJar.absolutePath
+        )
+            .directory(runDir)
+            .inheritIO()
+            .start()
+
+        val exitCode = process.waitFor()
+        if (exitCode != 0) {
+            throw GradleException("Mindustry exited with code $exitCode.")
+        }
     }
 }
