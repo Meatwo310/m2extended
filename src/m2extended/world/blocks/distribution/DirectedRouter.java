@@ -1,8 +1,11 @@
 package m2extended.world.blocks.distribution;
 
+import arc.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -12,6 +15,7 @@ import mindustry.world.meta.*;
 public class DirectedRouter extends Block{
     public float speed = 8f;
     public int[] outputOffsets = {0, 1, -1};
+    public TextureRegion topRegion;
 
     public DirectedRouter(String name){
         super(name);
@@ -31,10 +35,33 @@ public class DirectedRouter extends Block{
         return this;
     }
 
+    @Override
+    public void load(){
+        super.load();
+        topRegion = Core.atlas.find(name + "-top");
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, topRegion};
+    }
+
+    @Override
+    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
+        Draw.rect(region, plan.drawx(), plan.drawy());
+        Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
+    }
+
     public class DirectedRouterBuild extends Building{
         public Item lastItem;
         public float time;
         public int outputIndex;
+
+        @Override
+        public void draw(){
+            Draw.rect(region, x, y);
+            Draw.rect(topRegion, x, y, rotdeg());
+        }
 
         @Override
         public void updateTile(){

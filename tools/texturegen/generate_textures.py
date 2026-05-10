@@ -42,18 +42,18 @@ def shift_rgba(
     return result
 
 
-def draw_marker(image: Image.Image, directions: tuple[str, ...]) -> Image.Image:
+def draw_router_top(image: Image.Image, blocked: str | None = None) -> Image.Image:
     scale = 4
     big = image.resize((image.width * scale, image.height * scale), Image.Resampling.NEAREST)
     draw = ImageDraw.Draw(big, "RGBA")
     cx = image.width * scale / 2
     cy = image.height * scale / 2
 
-    for color, width in ((SHADOW, 3 * scale), (WHITE, 2 * scale)):
-        if "up" in directions:
-            draw_chevron(draw, cx, cy - 13 * scale, "up", 3.2 * scale, color, width)
-        if "down" in directions:
-            draw_chevron(draw, cx, cy + 13 * scale, "down", 3.2 * scale, color, width)
+    if blocked is not None:
+        y = cy - 13 * scale if blocked == "up" else cy + 13 * scale
+
+        for color, width in ((SHADOW, 3 * scale), (WHITE, 2 * scale)):
+            draw_x(draw, cx, y, 3.2 * scale, color, width)
 
     return big.resize(image.size, Image.Resampling.LANCZOS)
 
@@ -73,11 +73,11 @@ def tint_arrow(image: Image.Image) -> Image.Image:
     return result
 
 
-def composite_router(name: str, directions: tuple[str, ...]) -> None:
+def composite_router(name: str, blocked: str | None = None) -> None:
     base = shift_rgba(Image.open(VANILLA_DUCTS / "duct-router.png"))
     top = tint_arrow(Image.open(VANILLA_DUCTS / "duct-router-top.png"))
-    image = draw_marker(Image.alpha_composite(base, top), directions)
-    image.save(OUT / name)
+    base.save(OUT / name)
+    draw_router_top(top, blocked).save(OUT / name.replace(".png", "-top.png"))
 
 
 def draw_chevron(
@@ -101,19 +101,33 @@ def draw_chevron(
     draw.line(points, fill=color, width=width, joint="curve")
 
 
+def draw_x(
+    draw: ImageDraw.ImageDraw,
+    cx: float,
+    cy: float,
+    size: float,
+    color: tuple[int, int, int, int],
+    width: int,
+) -> None:
+    draw.line([(cx - size, cy - size), (cx + size, cy + size)], fill=color, width=width)
+    draw.line([(cx - size, cy + size), (cx + size, cy - size)], fill=color, width=width)
+
+
 def composite_junction() -> None:
     image = shift_rgba(Image.open(VANILLA_DISTRIBUTION / "junction.png"))
+    image.save(OUT / "directed-junction.png")
+    top = Image.new("RGBA", image.size, (0, 0, 0, 0))
     scale = 4
-    big = image.resize((image.width * scale, image.height * scale), Image.Resampling.NEAREST)
+    big = top.resize((top.width * scale, top.height * scale), Image.Resampling.NEAREST)
     draw = ImageDraw.Draw(big, "RGBA")
-    cx = image.width * scale / 2
-    cy = image.height * scale / 2
+    cx = top.width * scale / 2
+    cy = top.height * scale / 2
 
     for color, width in ((SHADOW, 3 * scale), (WHITE, 2 * scale)):
         draw_chevron(draw, cx + 11 * scale, cy, "right", 3.6 * scale, color, width)
         draw_chevron(draw, cx, cy + 11 * scale, "down", 3.6 * scale, color, width)
 
-    big.resize(image.size, Image.Resampling.LANCZOS).save(OUT / "directed-junction.png")
+    big.resize(top.size, Image.Resampling.LANCZOS).save(OUT / "directed-junction-top.png")
 
 
 def main() -> None:
@@ -121,9 +135,9 @@ def main() -> None:
         raise SystemExit(f"Mindustry assets not found: {VANILLA_DUCTS}")
 
     OUT.mkdir(parents=True, exist_ok=True)
-    composite_router("directed-router.png", ("up", "down"))
-    composite_router("right-directed-router.png", ("down",))
-    composite_router("left-directed-router.png", ("up",))
+    composite_router("directed-router.png")
+    composite_router("right-directed-router.png", "up")
+    composite_router("left-directed-router.png", "down")
     composite_junction()
 
     for name in (
@@ -131,6 +145,10 @@ def main() -> None:
         "right-directed-router.png",
         "left-directed-router.png",
         "directed-junction.png",
+        "directed-router-top.png",
+        "right-directed-router-top.png",
+        "left-directed-router-top.png",
+        "directed-junction-top.png",
     ):
         print(OUT / name)
 
