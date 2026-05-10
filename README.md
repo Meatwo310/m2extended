@@ -5,7 +5,7 @@ logistics blocks while staying close to vanilla progression.
 
 ## Requirements
 
-- Mindustry `154` or later
+- Mindustry `157` or later
 - No mod dependencies
 
 ## Content
