@@ -16,7 +16,7 @@ import static mindustry.type.ItemStack.*;
 
 public class M2Blocks{
     public static Block leadArmoredConveyor, siliconArmoredConveyor;
-    public static Block directedRouter, rightDirectedRouter, leftDirectedRouter, directedJunction;
+    public static Block instantRouter, instantJunction, directedRouter, rightDirectedRouter, leftDirectedRouter, directedJunction;
     public static Block leadPlatedConduit, siliconPlatedConduit;
 
     public static void load(){
@@ -35,6 +35,19 @@ public class M2Blocks{
             speed = 0.08f;
             displayedSpeed = 11f;
             researchCost = with(Items.copper, 80, Items.lead, 80, Items.titanium, 80, Items.silicon, 80);
+        }};
+
+        instantRouter = new InstantRouter("instant-router"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 2));
+            buildCostMultiplier = 4f;
+            researchCost = with(Items.copper, 30, Items.lead, 20);
+        }};
+
+        instantJunction = new InstantJunction("instant-junction"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 2));
+            health = 30;
+            buildCostMultiplier = 6f;
+            researchCost = with(Items.copper, 30, Items.lead, 20);
         }};
 
         directedRouter = new DirectedRouter("directed-router"){{
@@ -92,6 +105,8 @@ public class M2Blocks{
     private static void loadTechTree(){
         addTechNode(Blocks.conveyor, leadArmoredConveyor, Seq.with(new SectorComplete(SectorPresets.groundZero)));
         addTechNode(Blocks.titaniumConveyor, siliconArmoredConveyor, null);
+        addTechNode(Blocks.router, instantRouter, null);
+        addTechNode(Blocks.junction, instantJunction, null);
         addTechNode(Blocks.router, directedRouter, null);
         addTechNode(directedRouter, rightDirectedRouter, null);
         addTechNode(directedRouter, leftDirectedRouter, null);

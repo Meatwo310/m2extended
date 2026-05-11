@@ -130,6 +130,11 @@ def composite_junction() -> None:
     big.resize(top.size, Image.Resampling.LANCZOS).save(OUT / "directed-junction-top.png")
 
 
+def composite_instant_blocks() -> None:
+    shift_rgba(Image.open(VANILLA_DISTRIBUTION / "router.png")).save(OUT / "instant-router.png")
+    Image.open(OUT / "directed-junction.png").save(OUT / "instant-junction.png")
+
+
 def main() -> None:
     if not VANILLA_DUCTS.is_dir():
         raise SystemExit(f"Mindustry assets not found: {VANILLA_DUCTS}")
@@ -139,12 +144,15 @@ def main() -> None:
     composite_router("right-directed-router.png", "up")
     composite_router("left-directed-router.png", "down")
     composite_junction()
+    composite_instant_blocks()
 
     for name in (
         "directed-router.png",
         "right-directed-router.png",
         "left-directed-router.png",
         "directed-junction.png",
+        "instant-router.png",
+        "instant-junction.png",
         "directed-router-top.png",
         "right-directed-router-top.png",
         "left-directed-router-top.png",

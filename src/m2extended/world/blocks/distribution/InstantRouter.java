@@ -1,74 +1,39 @@
 package m2extended.world.blocks.distribution;
 
-import arc.*;
-import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
 import arc.util.io.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-public class DirectedRouter extends Block{
+public class InstantRouter extends Block{
     public int[] outputOffsets = {0, 1, -1};
-    public TextureRegion topRegion;
 
-    public DirectedRouter(String name){
+    public InstantRouter(String name){
         super(name);
         solid = false;
         underBullets = true;
         update = false;
         destructible = true;
-        rotate = true;
-        hasItems = true;
         instantTransfer = true;
-        itemCapacity = 0;
         group = BlockGroup.transportation;
         unloadable = false;
+        itemCapacity = 0;
         canOverdrive = false;
     }
 
-    public DirectedRouter outputs(int... outputOffsets){
-        this.outputOffsets = outputOffsets;
-        return this;
-    }
-
     @Override
-    public void load(){
-        super.load();
-        topRegion = Core.atlas.find(name + "-top");
+    public boolean outputsItems(){
+        return true;
     }
 
-    @Override
-    public TextureRegion[] icons(){
-        return new TextureRegion[]{region, topRegion};
-    }
-
-    @Override
-    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        Draw.rect(region, plan.drawx(), plan.drawy());
-        Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
-    }
-
-    public class DirectedRouterBuild extends Building{
+    public class InstantRouterBuild extends Building{
         public int outputIndex;
 
         @Override
-        public void draw(){
-            Draw.rect(region, x, y);
-            Draw.rect(topRegion, x, y, rotdeg());
-        }
-
-        @Override
-        public int acceptStack(Item item, int amount, Teamc source){
-            return 0;
-        }
-
-        @Override
         public boolean acceptItem(Building source, Item item){
-            return source != null && team == source.team && source.relativeTo(tile) == rotation && getTileTarget(item, source, false) != null;
+            return source != null && source.team == team && getTileTarget(item, source, false) != null;
         }
 
         @Override
@@ -81,9 +46,13 @@ public class DirectedRouter extends Block{
         }
 
         public Building getTileTarget(Item item, Building source, boolean set){
+            int from = source.relativeTo(tile);
+            if(from == -1) return null;
+
             for(int i = 0; i < outputOffsets.length; i++){
                 int index = (i + outputIndex) % outputOffsets.length;
-                Building other = nearby(Mathf.mod(rotation + outputOffsets[index], 4));
+                int direction = Mathf.mod(from + outputOffsets[index], 4);
+                Building other = nearby(direction);
 
                 if(other != null && other.team == team && !(source.block.instantTransfer && other.block.instantTransfer) && other.acceptItem(this, item)){
                     if(set){
@@ -98,7 +67,7 @@ public class DirectedRouter extends Block{
 
         @Override
         public byte version(){
-            return 2;
+            return 1;
         }
 
         @Override
@@ -111,7 +80,6 @@ public class DirectedRouter extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             outputIndex = read.s();
-            items.clear();
         }
     }
 }

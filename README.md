@@ -16,10 +16,12 @@ logistics blocks while staying close to vanilla progression.
 | --- | --- | --- | --- |
 | Lead Armored Conveyor | Conveyor, after Ground Zero | `copper/1`, `lead/1` | Cheap armored conveyor that rejects side input from non-conveyors. |
 | Silicon Armored Conveyor | Titanium Conveyor | `copper/1`, `lead/1`, `titanium/1`, `silicon/1` | Armored conveyor with titanium conveyor speed. |
-| Directed Router | Router | `copper/3`, `lead/1` | One-way router that accepts back input and distributes to front, left, and right. |
-| Right Directed Router | Directed Router | `copper/3`, `lead/1` | One-way router that distributes back input to front and right. |
-| Left Directed Router | Directed Router | `copper/3`, `lead/1` | One-way router that distributes back input to front and left. |
-| Directed Junction | Junction | `copper/3`, `lead/1` | One-way junction that moves back input forward and left input right. |
+| Instant Router | Router | `copper/3`, `lead/2` | Router variant that immediately distributes input without an internal buffer. |
+| Instant Junction | Junction | `copper/3`, `lead/2` | Junction variant that immediately passes crossing input without an internal buffer. |
+| Directed Router | Router | `copper/3`, `lead/1` | One-way instant router that accepts back input and distributes to front, left, and right. |
+| Right Directed Router | Directed Router | `copper/3`, `lead/1` | One-way instant router that distributes back input to front and right. |
+| Left Directed Router | Directed Router | `copper/3`, `lead/1` | One-way instant router that distributes back input to front and left. |
+| Directed Junction | Junction | `copper/3`, `lead/1` | One-way instant junction that moves back input forward and left input right. |
 
 ### Liquid
 
