@@ -2,6 +2,7 @@ package m2extended.world.blocks.payloads;
 
 import arc.*;
 import arc.graphics.g2d.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.ctype.*;
@@ -78,18 +79,18 @@ public class PayloadStorageBlock extends PayloadBlock{
     }
 
     public class PayloadStorageBuild extends PayloadBlockBuild<Payload>{
-        public PayloadSeq payloads = new PayloadSeq();
-        public UnlockableContent storedContent;
+        public Seq<Payload> payloadQueue = new Seq<>();
+        public PayloadSeq payloadCounts = new PayloadSeq();
         public boolean exporting;
 
         @Override
         public boolean acceptUnitPayload(Unit unit){
-            return unit.type.allowedInPayloads && unit.hitSize / tilesize <= maxPayloadSize && canStore(unit.type);
+            return payload == null && unit.type.allowedInPayloads && unit.hitSize / tilesize <= maxPayloadSize && canStore(unit.type);
         }
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return payload.fits(maxPayloadSize) && canStore(payload.content());
+            return this.payload == null && payload.fits(maxPayloadSize) && canStore(payload.content());
         }
 
         @Override
@@ -104,15 +105,15 @@ public class PayloadStorageBlock extends PayloadBlock{
         }
 
         public int payloadAmount(){
-            return payloads.total() + (payload == null ? 0 : 1);
+            return payloadQueue.size + (payload == null ? 0 : 1);
         }
 
         public UnlockableContent currentContent(){
-            if(storedContent != null){
-                return storedContent;
+            if(payload != null){
+                return payload.content();
             }
 
-            return payload == null ? null : payload.content();
+            return payloadQueue.any() ? payloadQueue.first().content() : null;
         }
 
         @Override
@@ -129,14 +130,14 @@ public class PayloadStorageBlock extends PayloadBlock{
                 return;
             }
 
-            if(enabled && payloads.any()){
-                Payload next = createPayload(storedContent);
-                if(next != null && canOutput(next)){
-                    removeStored(storedContent);
-                    payload = next;
+            if(enabled && payloadQueue.any()){
+                Payload next = payloadQueue.first();
+                if(canOutput(next)){
+                    payload = payloadQueue.remove(0);
                     exporting = true;
                     payVector.setZero();
                     payRotation = rotdeg();
+                    rebuildPayloadCounts();
                     moveOutPayload();
                 }
             }
@@ -148,26 +149,25 @@ public class PayloadStorageBlock extends PayloadBlock{
         }
 
         public void storePayload(Payload payload){
-            storedContent = payload.content();
-            payloads.add(storedContent);
+            payloadQueue.add(payload);
+            payloadCounts.add(payload.content());
         }
 
-        public void removeStored(UnlockableContent content){
-            payloads.remove(content);
-            if(payloads.total() <= 0){
-                payloads.clear();
-                storedContent = null;
+        public void rebuildPayloadCounts(){
+            payloadCounts.clear();
+            for(Payload queued : payloadQueue){
+                payloadCounts.add(queued.content());
             }
         }
 
-        public Payload createPayload(UnlockableContent content){
-            if(content instanceof Block){
-                return new BuildPayload((Block)content, team);
-            }else if(content instanceof UnitType){
-                return new UnitPayload(((UnitType)content).create(team));
+        public int countPayloads(Content content){
+            int amount = 0;
+            for(Payload queued : payloadQueue){
+                if(queued.content() == content) amount++;
             }
 
-            return null;
+            if(payload != null && payload.content() == content) amount++;
+            return amount;
         }
 
         @Override
@@ -178,9 +178,9 @@ public class PayloadStorageBlock extends PayloadBlock{
                 return taken;
             }
 
-            if(storedContent != null && payloads.any()){
-                Payload taken = createPayload(storedContent);
-                removeStored(storedContent);
+            if(payloadQueue.any()){
+                Payload taken = payloadQueue.remove(0);
+                rebuildPayloadCounts();
                 return taken;
             }
 
@@ -189,7 +189,32 @@ public class PayloadStorageBlock extends PayloadBlock{
 
         @Override
         public PayloadSeq getPayloads(){
-            return payloads;
+            return payloadCounts;
+        }
+
+        @Override
+        public void onRemoved(){
+            super.onRemoved();
+
+            if(!carried){
+                for(Payload queued : payloadQueue){
+                    queued.set(x, y, rotdeg());
+                    queued.dump();
+                }
+                payloadQueue.clear();
+                payloadCounts.clear();
+            }
+        }
+
+        @Override
+        public void onDestroyed(){
+            for(Payload queued : payloadQueue){
+                queued.destroyed();
+            }
+            payloadQueue.clear();
+            payloadCounts.clear();
+
+            super.onDestroyed();
         }
 
         @Override
@@ -223,11 +248,11 @@ public class PayloadStorageBlock extends PayloadBlock{
         @Override
         public double sense(Content content){
             if(content instanceof UnitType){
-                return payloads.get((UnitType)content) + (payload instanceof UnitPayload && ((UnitPayload)payload).unit.type == content ? 1 : 0);
+                return countPayloads(content);
             }
 
             if(content instanceof Block){
-                return payloads.get((Block)content) + (payload instanceof BuildPayload && ((BuildPayload)payload).block() == content ? 1 : 0);
+                return countPayloads(content);
             }
 
             return super.sense(content);
@@ -244,34 +269,57 @@ public class PayloadStorageBlock extends PayloadBlock{
 
         @Override
         public byte version(){
-            return 1;
+            return 2;
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
-            payloads.write(write);
-            write.b(storedContent == null ? -1 : storedContent.getContentType().ordinal());
-            write.s(storedContent == null ? -1 : storedContent.id);
+            write.s(payloadQueue.size);
+            for(Payload queued : payloadQueue){
+                Payload.write(queued, write);
+            }
             write.bool(exporting);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            payloads.read(read);
+            payloadQueue.clear();
+            payloadCounts.clear();
 
-            if(revision >= 1){
+            if(revision >= 2){
+                short amount = read.s();
+                for(int i = 0; i < amount; i++){
+                    Payload queued = Payload.read(read);
+                    if(queued != null && queued.fits(maxPayloadSize) && canStore(queued.content())){
+                        payloadQueue.add(queued);
+                        payloadCounts.add(queued.content());
+                    }
+                }
+                exporting = read.bool();
+            }else if(revision >= 1){
+                PayloadSeq legacyPayloads = new PayloadSeq();
+                legacyPayloads.read(read);
+
                 byte type = read.b();
                 short id = read.s();
-                storedContent = type == -1 ? null : content.getByID(ContentType.all[type], id);
+                UnlockableContent storedContent = type == -1 ? null : content.getByID(ContentType.all[type], id);
                 exporting = read.bool();
-            }
 
-            if(storedContent == null){
-                payloads.clear();
-            }else{
-                payloads.removeAll(content -> content != storedContent);
+                if(storedContent instanceof Block block){
+                    for(int i = 0; i < legacyPayloads.get(block); i++){
+                        Payload queued = new BuildPayload(block, team);
+                        payloadQueue.add(queued);
+                        payloadCounts.add(block);
+                    }
+                }else if(storedContent instanceof UnitType unitType){
+                    for(int i = 0; i < legacyPayloads.get(unitType); i++){
+                        Payload queued = new UnitPayload(unitType.create(team));
+                        payloadQueue.add(queued);
+                        payloadCounts.add(unitType);
+                    }
+                }
             }
         }
     }
