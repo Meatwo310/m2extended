@@ -16,16 +16,16 @@ logistics blocks while staying close to vanilla progression.
 | --- | --- | --- | --- |
 | Lead Armored Conveyor | Conveyor, after Ground Zero | `copper/1`, `lead/1` | Cheap armored conveyor that rejects side input from non-conveyors. |
 | Silicon Armored Conveyor | Titanium Conveyor | `copper/1`, `lead/1`, `titanium/1`, `silicon/1` | Armored conveyor with titanium conveyor speed. |
-| Lead Directed Router | Router | `copper/3`, `lead/1` | One-way router that accepts back input and distributes to front, left, and right after a short delay. |
-| Lead Right Directed Router | Lead Directed Router | `copper/3`, `lead/1` | One-way router that distributes back input to front and right after a short delay. |
-| Lead Left Directed Router | Lead Directed Router | `copper/3`, `lead/1` | One-way router that distributes back input to front and left after a short delay. |
-| Lead Directed Junction | Junction | `copper/3`, `lead/1` | One-way junction that moves back input forward and left input right after a short delay. |
+| Lead Directed Router | Router | `copper/3`, `lead/3` | One-way router that accepts back input and distributes to front, left, and right after a short delay. |
+| Lead Right Directed Router | Lead Directed Router | `copper/3`, `lead/3` | One-way router that distributes back input to front and right after a short delay. |
+| Lead Left Directed Router | Lead Directed Router | `copper/3`, `lead/3` | One-way router that distributes back input to front and left after a short delay. |
+| Lead Directed Junction | Junction | `copper/3`, `lead/3` | One-way junction that moves back input forward and left input right after a short delay. |
 | Silicon Router | Router | `copper/3`, `lead/2`, `silicon/1` | Router variant that immediately distributes input without an internal buffer. |
 | Silicon Junction | Junction | `copper/3`, `lead/2`, `silicon/1` | Junction variant that immediately passes crossing input without an internal buffer. |
-| Silicon Directed Router | Lead Directed Router | `copper/3`, `lead/1`, `silicon/1` | One-way instant router that accepts back input and distributes to front, left, and right. |
-| Silicon Right Directed Router | Lead Right Directed Router | `copper/3`, `lead/1`, `silicon/1` | One-way instant router that distributes back input to front and right. |
-| Silicon Left Directed Router | Lead Left Directed Router | `copper/3`, `lead/1`, `silicon/1` | One-way instant router that distributes back input to front and left. |
-| Silicon Directed Junction | Lead Directed Junction | `copper/3`, `lead/1`, `silicon/1` | One-way instant junction that moves back input forward and left input right. |
+| Silicon Directed Router | Lead Directed Router | `copper/3`, `lead/3`, `silicon/3` | One-way instant router that accepts back input and distributes to front, left, and right. |
+| Silicon Right Directed Router | Lead Right Directed Router | `copper/3`, `lead/3`, `silicon/3` | One-way instant router that distributes back input to front and right. |
+| Silicon Left Directed Router | Lead Left Directed Router | `copper/3`, `lead/3`, `silicon/3` | One-way instant router that distributes back input to front and left. |
+| Silicon Directed Junction | Lead Directed Junction | `copper/3`, `lead/3`, `silicon/3` | One-way instant junction that moves back input forward and left input right. |
 
 ### Liquid
 
