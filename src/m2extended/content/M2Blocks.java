@@ -10,6 +10,7 @@ import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 import m2extended.world.blocks.distribution.*;
+import m2extended.world.blocks.payloads.*;
 
 import mindustry.content.TechTree.*;
 import static mindustry.type.ItemStack.*;
@@ -20,6 +21,7 @@ public class M2Blocks{
     public static Block siliconInstantRouter, siliconInstantJunction;
     public static Block leadDirectedRouter, leadRightDirectedRouter, leadLeftDirectedRouter, leadDirectedJunction;
     public static Block siliconDirectedRouter, siliconRightDirectedRouter, siliconLeftDirectedRouter, siliconDirectedJunction;
+    public static Block payloadContainer, payloadVault;
 
     public static void load(){
         leadArmoredConveyor = new ArmoredConveyor("lead-armored-conveyor"){{
@@ -114,6 +116,20 @@ public class M2Blocks{
             buildCostMultiplier = 6f;
         }};
 
+        payloadContainer = new PayloadStorageBlock("payload-container"){{
+            requirements(Category.units, with(Items.graphite, 40, Items.silicon, 60, Items.titanium, 40));
+            payloadCapacity = 8;
+            scaledHealth = 70;
+            fallbackRegion = fullOverride = "container";
+        }};
+
+        payloadVault = new PayloadStorageBlock("payload-vault"){{
+            requirements(Category.units, with(Items.graphite, 100, Items.silicon, 160, Items.titanium, 120, Items.thorium, 80));
+            payloadCapacity = 24;
+            scaledHealth = 90;
+            fallbackRegion = fullOverride = "vault";
+        }};
+
         loadTechTree();
     }
 
@@ -132,6 +148,8 @@ public class M2Blocks{
         addTechNode(leadDirectedJunction, siliconDirectedJunction, null);
         addTechNode(Blocks.conduit, leadPlatedConduit, null);
         addTechNode(Blocks.pulseConduit, siliconPlatedConduit, null);
+        addTechNode(Blocks.payloadRouter, payloadContainer, null);
+        addTechNode(payloadContainer, payloadVault, null);
     }
 
     private static void addTechNode(UnlockableContent parent, UnlockableContent content, Seq<Objective> objectives){
