@@ -110,8 +110,6 @@ public class M2Blocks{
 
         siliconDirectedJunction = new InstantDirectedJunction("silicon-directed-junction"){{
             requirements(Category.distribution, with(Items.copper, 3, Items.lead, 3, Items.silicon, 3));
-            speed = 26;
-            capacity = 6;
             health = 30;
             buildCostMultiplier = 6f;
         }};

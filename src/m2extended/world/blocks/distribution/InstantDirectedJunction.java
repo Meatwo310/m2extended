@@ -4,17 +4,13 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
 public class InstantDirectedJunction extends Block{
-    public float speed = 26;
-    public int capacity = 6;
     public TextureRegion topRegion;
 
     public InstantDirectedJunction(String name){
@@ -89,18 +85,6 @@ public class InstantDirectedJunction extends Block{
             return to != null && to.team == team && !(source.block.instantTransfer && to.block.instantTransfer) && to.acceptItem(this, item) ? to : null;
         }
 
-        @Override
-        public byte version(){
-            return 1;
-        }
-
-        @Override
-        public void read(Reads read, byte revision){
-            super.read(read, revision);
-            if(revision < 1){
-                new DirectionalItemBuffer(capacity).read(read, revision == 0);
-            }
-        }
     }
 
     private int rightDirection(int direction){
