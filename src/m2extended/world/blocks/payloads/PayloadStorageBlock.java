@@ -192,6 +192,16 @@ public class PayloadStorageBlock extends PayloadBlock{
             return payloadCounts;
         }
 
+        public void drawStoredPayload(){
+            if(payloadQueue.isEmpty()) return;
+
+            Payload queued = payloadQueue.first();
+            float previewSize = Math.min(queued.size(), size * tilesize);
+
+            Draw.z(Layer.blockOver);
+            Draw.rect(queued.icon(), x, y, previewSize, previewSize);
+        }
+
         @Override
         public void onRemoved(){
             super.onRemoved();
@@ -227,10 +237,8 @@ public class PayloadStorageBlock extends PayloadBlock{
                 Draw.color();
             }
 
-            UnlockableContent content = currentContent();
-            if(content != null && payload == null){
-                Draw.z(Layer.blockOver);
-                Draw.rect(content.fullIcon, x, y, 24f, 24f);
+            if(payload == null){
+                drawStoredPayload();
             }
 
             drawPayload();
