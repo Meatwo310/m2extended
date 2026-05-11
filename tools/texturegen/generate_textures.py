@@ -14,12 +14,14 @@ OUT = ROOT / "sprites" / "blocks"
 
 SHADOW = (30, 33, 40, 220)
 WHITE = (240, 246, 248, 255)
+LEAD_HUE = 0.82
+SILICON_HUE = 0.565
 
 
 def shift_rgba(
     image: Image.Image,
     *,
-    hue: float = 0.82,
+    hue: float = LEAD_HUE,
     sat_mul: float = 0.72,
     sat_add: float = 0.18,
     val_mul: float = 1.08,
@@ -40,6 +42,10 @@ def shift_rgba(
             pixels[x, y] = (round(rr * 255), round(gg * 255), round(bb * 255), a)
 
     return result
+
+
+def shift_silicon(image: Image.Image) -> Image.Image:
+    return shift_rgba(image, hue=SILICON_HUE, sat_add=0.25, val_mul=1.6)
 
 
 def draw_router_top(image: Image.Image, blocked: str | None = None) -> Image.Image:
@@ -73,8 +79,9 @@ def tint_arrow(image: Image.Image) -> Image.Image:
     return result
 
 
-def composite_router(name: str, blocked: str | None = None) -> None:
-    base = shift_rgba(Image.open(VANILLA_DUCTS / "duct-router.png"))
+def composite_router(name: str, blocked: str | None = None, *, hue: float = LEAD_HUE) -> None:
+    image = Image.open(VANILLA_DUCTS / "duct-router.png")
+    base = shift_silicon(image) if hue == SILICON_HUE else shift_rgba(image, hue=hue)
     top = tint_arrow(Image.open(VANILLA_DUCTS / "duct-router-top.png"))
     base.save(OUT / name)
     draw_router_top(top, blocked).save(OUT / name.replace(".png", "-top.png"))
@@ -113,9 +120,10 @@ def draw_x(
     draw.line([(cx - size, cy + size), (cx + size, cy - size)], fill=color, width=width)
 
 
-def composite_junction() -> None:
-    image = shift_rgba(Image.open(VANILLA_DISTRIBUTION / "junction.png"))
-    image.save(OUT / "directed-junction.png")
+def composite_junction(name: str = "directed-junction.png", *, hue: float = LEAD_HUE) -> None:
+    source = Image.open(VANILLA_DISTRIBUTION / "junction.png")
+    image = shift_silicon(source) if hue == SILICON_HUE else shift_rgba(source, hue=hue)
+    image.save(OUT / name)
     top = Image.new("RGBA", image.size, (0, 0, 0, 0))
     scale = 4
     big = top.resize((top.width * scale, top.height * scale), Image.Resampling.NEAREST)
@@ -127,12 +135,12 @@ def composite_junction() -> None:
         draw_chevron(draw, cx + 11 * scale, cy, "right", 3.6 * scale, color, width)
         draw_chevron(draw, cx, cy + 11 * scale, "down", 3.6 * scale, color, width)
 
-    big.resize(top.size, Image.Resampling.LANCZOS).save(OUT / "directed-junction-top.png")
+    big.resize(top.size, Image.Resampling.LANCZOS).save(OUT / name.replace(".png", "-top.png"))
 
 
 def composite_instant_blocks() -> None:
-    shift_rgba(Image.open(VANILLA_DISTRIBUTION / "router.png")).save(OUT / "instant-router.png")
-    Image.open(OUT / "directed-junction.png").save(OUT / "instant-junction.png")
+    shift_silicon(Image.open(VANILLA_DISTRIBUTION / "router.png")).save(OUT / "silicon-router.png")
+    shift_silicon(Image.open(VANILLA_DISTRIBUTION / "junction.png")).save(OUT / "silicon-junction.png")
 
 
 def main() -> None:
@@ -140,23 +148,35 @@ def main() -> None:
         raise SystemExit(f"Mindustry assets not found: {VANILLA_DUCTS}")
 
     OUT.mkdir(parents=True, exist_ok=True)
-    composite_router("directed-router.png")
-    composite_router("right-directed-router.png", "up")
-    composite_router("left-directed-router.png", "down")
-    composite_junction()
+    composite_router("lead-directed-router.png")
+    composite_router("lead-right-directed-router.png", "up")
+    composite_router("lead-left-directed-router.png", "down")
+    composite_junction("lead-directed-junction.png")
+    composite_router("silicon-directed-router.png", hue=SILICON_HUE)
+    composite_router("silicon-right-directed-router.png", "up", hue=SILICON_HUE)
+    composite_router("silicon-left-directed-router.png", "down", hue=SILICON_HUE)
+    composite_junction("silicon-directed-junction.png", hue=SILICON_HUE)
     composite_instant_blocks()
 
     for name in (
-        "directed-router.png",
-        "right-directed-router.png",
-        "left-directed-router.png",
-        "directed-junction.png",
-        "instant-router.png",
-        "instant-junction.png",
-        "directed-router-top.png",
-        "right-directed-router-top.png",
-        "left-directed-router-top.png",
-        "directed-junction-top.png",
+        "lead-directed-router.png",
+        "lead-right-directed-router.png",
+        "lead-left-directed-router.png",
+        "lead-directed-junction.png",
+        "lead-directed-router-top.png",
+        "lead-right-directed-router-top.png",
+        "lead-left-directed-router-top.png",
+        "lead-directed-junction-top.png",
+        "silicon-router.png",
+        "silicon-junction.png",
+        "silicon-directed-router.png",
+        "silicon-right-directed-router.png",
+        "silicon-left-directed-router.png",
+        "silicon-directed-junction.png",
+        "silicon-directed-router-top.png",
+        "silicon-right-directed-router-top.png",
+        "silicon-left-directed-router-top.png",
+        "silicon-directed-junction-top.png",
     ):
         print(OUT / name)
 

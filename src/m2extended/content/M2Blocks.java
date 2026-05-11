@@ -16,7 +16,9 @@ import static mindustry.type.ItemStack.*;
 
 public class M2Blocks{
     public static Block leadArmoredConveyor, siliconArmoredConveyor;
-    public static Block instantRouter, instantJunction, directedRouter, rightDirectedRouter, leftDirectedRouter, directedJunction;
+    public static Block siliconInstantRouter, siliconInstantJunction;
+    public static Block leadDirectedRouter, leadRightDirectedRouter, leadLeftDirectedRouter, leadDirectedJunction;
+    public static Block siliconDirectedRouter, siliconRightDirectedRouter, siliconLeftDirectedRouter, siliconDirectedJunction;
     public static Block leadPlatedConduit, siliconPlatedConduit;
 
     public static void load(){
@@ -37,46 +39,75 @@ public class M2Blocks{
             researchCost = with(Items.copper, 80, Items.lead, 80, Items.titanium, 80, Items.silicon, 80);
         }};
 
-        instantRouter = new InstantRouter("instant-router"){{
-            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 2));
+        siliconInstantRouter = new InstantRouter("silicon-router"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 2, Items.silicon, 1));
             buildCostMultiplier = 4f;
-            researchCost = with(Items.copper, 30, Items.lead, 20);
+            researchCost = with(Items.copper, 30, Items.lead, 20, Items.silicon, 20);
         }};
 
-        instantJunction = new InstantJunction("instant-junction"){{
-            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 2));
+        siliconInstantJunction = new InstantJunction("silicon-junction"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 2, Items.silicon, 1));
             health = 30;
             buildCostMultiplier = 6f;
-            researchCost = with(Items.copper, 30, Items.lead, 20);
+            researchCost = with(Items.copper, 30, Items.lead, 20, Items.silicon, 20);
         }};
 
-        directedRouter = new DirectedRouter("directed-router"){{
+        leadDirectedRouter = new DirectedRouter("lead-directed-router"){{
             requirements(Category.distribution, with(Items.copper, 3, Items.lead, 1));
             buildCostMultiplier = 4f;
             researchCost = with(Items.copper, 30, Items.lead, 10);
         }};
 
-        rightDirectedRouter = new DirectedRouter("right-directed-router"){{
+        leadRightDirectedRouter = new DirectedRouter("lead-right-directed-router"){{
             requirements(Category.distribution, with(Items.copper, 3, Items.lead, 1));
             outputs(0, -1);
             buildCostMultiplier = 4f;
             researchCost = with(Items.copper, 30, Items.lead, 10);
         }};
 
-        leftDirectedRouter = new DirectedRouter("left-directed-router"){{
+        leadLeftDirectedRouter = new DirectedRouter("lead-left-directed-router"){{
             requirements(Category.distribution, with(Items.copper, 3, Items.lead, 1));
             outputs(0, 1);
             buildCostMultiplier = 4f;
             researchCost = with(Items.copper, 30, Items.lead, 10);
         }};
 
-        directedJunction = new DirectedJunction("directed-junction"){{
+        leadDirectedJunction = new DirectedJunction("lead-directed-junction"){{
             requirements(Category.distribution, with(Items.copper, 3, Items.lead, 1));
             speed = 26;
             capacity = 6;
             health = 30;
             buildCostMultiplier = 6f;
             researchCost = with(Items.copper, 30, Items.lead, 10);
+        }};
+
+        siliconDirectedRouter = new InstantDirectedRouter("silicon-directed-router"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 1, Items.silicon, 1));
+            buildCostMultiplier = 4f;
+            researchCost = with(Items.copper, 30, Items.lead, 10, Items.silicon, 20);
+        }};
+
+        siliconRightDirectedRouter = new InstantDirectedRouter("silicon-right-directed-router"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 1, Items.silicon, 1));
+            outputs(0, -1);
+            buildCostMultiplier = 4f;
+            researchCost = with(Items.copper, 30, Items.lead, 10, Items.silicon, 20);
+        }};
+
+        siliconLeftDirectedRouter = new InstantDirectedRouter("silicon-left-directed-router"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 1, Items.silicon, 1));
+            outputs(0, 1);
+            buildCostMultiplier = 4f;
+            researchCost = with(Items.copper, 30, Items.lead, 10, Items.silicon, 20);
+        }};
+
+        siliconDirectedJunction = new InstantDirectedJunction("silicon-directed-junction"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 1, Items.silicon, 1));
+            speed = 26;
+            capacity = 6;
+            health = 30;
+            buildCostMultiplier = 6f;
+            researchCost = with(Items.copper, 30, Items.lead, 10, Items.silicon, 20);
         }};
 
         leadPlatedConduit = new ArmoredConduit("lead-plated-conduit"){{
@@ -105,12 +136,16 @@ public class M2Blocks{
     private static void loadTechTree(){
         addTechNode(Blocks.conveyor, leadArmoredConveyor, Seq.with(new SectorComplete(SectorPresets.groundZero)));
         addTechNode(Blocks.titaniumConveyor, siliconArmoredConveyor, null);
-        addTechNode(Blocks.router, instantRouter, null);
-        addTechNode(Blocks.junction, instantJunction, null);
-        addTechNode(Blocks.router, directedRouter, null);
-        addTechNode(directedRouter, rightDirectedRouter, null);
-        addTechNode(directedRouter, leftDirectedRouter, null);
-        addTechNode(Blocks.junction, directedJunction, null);
+        addTechNode(Blocks.router, leadDirectedRouter, null);
+        addTechNode(leadDirectedRouter, leadRightDirectedRouter, null);
+        addTechNode(leadDirectedRouter, leadLeftDirectedRouter, null);
+        addTechNode(Blocks.junction, leadDirectedJunction, null);
+        addTechNode(Blocks.router, siliconInstantRouter, null);
+        addTechNode(Blocks.junction, siliconInstantJunction, null);
+        addTechNode(leadDirectedRouter, siliconDirectedRouter, null);
+        addTechNode(leadRightDirectedRouter, siliconRightDirectedRouter, null);
+        addTechNode(leadLeftDirectedRouter, siliconLeftDirectedRouter, null);
+        addTechNode(leadDirectedJunction, siliconDirectedJunction, null);
         addTechNode(Blocks.conduit, leadPlatedConduit, null);
         addTechNode(Blocks.pulseConduit, siliconPlatedConduit, null);
     }

@@ -11,26 +11,26 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-public class DirectedRouter extends Block{
-    public float speed = 8f;
+public class InstantDirectedRouter extends Block{
     public int[] outputOffsets = {0, 1, -1};
     public TextureRegion topRegion;
 
-    public DirectedRouter(String name){
+    public InstantDirectedRouter(String name){
         super(name);
         solid = false;
         underBullets = true;
-        update = true;
+        update = false;
         destructible = true;
         rotate = true;
         hasItems = true;
-        itemCapacity = 1;
+        instantTransfer = true;
+        itemCapacity = 0;
         group = BlockGroup.transportation;
         unloadable = false;
-        noUpdateDisabled = true;
+        canOverdrive = false;
     }
 
-    public DirectedRouter outputs(int... outputOffsets){
+    public InstantDirectedRouter outputs(int... outputOffsets){
         this.outputOffsets = outputOffsets;
         return this;
     }
@@ -52,9 +52,7 @@ public class DirectedRouter extends Block{
         Draw.rect(topRegion, plan.drawx(), plan.drawy(), plan.rotation * 90);
     }
 
-    public class DirectedRouterBuild extends Building{
-        public Item lastItem;
-        public float time;
+    public class InstantDirectedRouterBuild extends Building{
         public int outputIndex;
 
         @Override
@@ -69,51 +67,25 @@ public class DirectedRouter extends Block{
         }
 
         @Override
-        public void updateTile(){
-            if(lastItem == null && items.any()){
-                lastItem = items.first();
-            }
-
-            if(lastItem != null){
-                time += 1f / speed * delta();
-                Building target = getTileTarget(lastItem, false);
-
-                if(target != null && (time >= 1f || !(target.block instanceof mindustry.world.blocks.distribution.Router || target.block.instantTransfer))){
-                    getTileTarget(lastItem, true);
-                    target.handleItem(this, lastItem);
-                    items.remove(lastItem, 1);
-                    lastItem = null;
-                }
-            }
-        }
-
-        @Override
         public boolean acceptItem(Building source, Item item){
-            return source != null && team == source.team && lastItem == null && items.total() == 0 && source.relativeTo(tile) == rotation;
+            return source != null && team == source.team && source.relativeTo(tile) == rotation && getTileTarget(item, source, false) != null;
         }
 
         @Override
         public void handleItem(Building source, Item item){
-            items.add(item, 1);
-            lastItem = item;
-            time = 0f;
-        }
+            Building target = getTileTarget(item, source, true);
 
-        @Override
-        public int removeStack(Item item, int amount){
-            int result = super.removeStack(item, amount);
-            if(result != 0 && item == lastItem){
-                lastItem = null;
+            if(target != null){
+                target.handleItem(this, item);
             }
-            return result;
         }
 
-        public Building getTileTarget(Item item, boolean set){
+        public Building getTileTarget(Item item, Building source, boolean set){
             for(int i = 0; i < outputOffsets.length; i++){
                 int index = (i + outputIndex) % outputOffsets.length;
                 Building other = nearby(Mathf.mod(rotation + outputOffsets[index], 4));
 
-                if(other != null && other.team == team && other.acceptItem(this, item)){
+                if(other != null && other.team == team && !(source.block.instantTransfer && other.block.instantTransfer) && other.acceptItem(this, item)){
                     if(set){
                         outputIndex = (index + 1) % outputOffsets.length;
                     }
@@ -139,6 +111,7 @@ public class DirectedRouter extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             outputIndex = read.s();
+            items.clear();
         }
     }
 }
