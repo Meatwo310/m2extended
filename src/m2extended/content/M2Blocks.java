@@ -16,10 +16,10 @@ import static mindustry.type.ItemStack.*;
 
 public class M2Blocks{
     public static Block leadArmoredConveyor, siliconArmoredConveyor;
+    public static Block leadPlatedConduit, siliconPlatedConduit;
     public static Block siliconInstantRouter, siliconInstantJunction;
     public static Block leadDirectedRouter, leadRightDirectedRouter, leadLeftDirectedRouter, leadDirectedJunction;
     public static Block siliconDirectedRouter, siliconRightDirectedRouter, siliconLeftDirectedRouter, siliconDirectedJunction;
-    public static Block leadPlatedConduit, siliconPlatedConduit;
 
     public static void load(){
         leadArmoredConveyor = new ArmoredConveyor("lead-armored-conveyor"){{
@@ -37,6 +37,26 @@ public class M2Blocks{
             speed = 0.08f;
             displayedSpeed = 11f;
             researchCost = with(Items.copper, 80, Items.lead, 80, Items.titanium, 80, Items.silicon, 80);
+        }};
+
+        leadPlatedConduit = new ArmoredConduit("lead-plated-conduit"){{
+            requirements(Category.liquid, with(Items.metaglass, 1, Items.lead, 1));
+            liquidCapacity = 20f;
+            health = 45;
+            explosivenessScale = 0.5f;
+            flammabilityScale = 0.5f;
+            buildCostMultiplier = 2f;
+            researchCost = with(Items.metaglass, 20, Items.lead, 20);
+        }};
+
+        siliconPlatedConduit = new ArmoredConduit("silicon-plated-conduit"){{
+            requirements(Category.liquid, with(Items.titanium, 2, Items.metaglass, 1, Items.silicon, 1));
+            liquidCapacity = 40f;
+            liquidPressure = 1.025f;
+            health = 90;
+            explosivenessScale = 0.4f;
+            flammabilityScale = 0.4f;
+            researchCost = with(Items.titanium, 80, Items.metaglass, 80, Items.silicon, 80);
         }};
 
         siliconInstantRouter = new InstantRouter("silicon-router"){{
@@ -108,26 +128,6 @@ public class M2Blocks{
             health = 30;
             buildCostMultiplier = 6f;
             researchCost = with(Items.copper, 30, Items.lead, 10, Items.silicon, 20);
-        }};
-
-        leadPlatedConduit = new ArmoredConduit("lead-plated-conduit"){{
-            requirements(Category.liquid, with(Items.metaglass, 1, Items.lead, 1));
-            liquidCapacity = 20f;
-            health = 45;
-            explosivenessScale = 0.5f;
-            flammabilityScale = 0.5f;
-            buildCostMultiplier = 2f;
-            researchCost = with(Items.metaglass, 20, Items.lead, 20);
-        }};
-
-        siliconPlatedConduit = new ArmoredConduit("silicon-plated-conduit"){{
-            requirements(Category.liquid, with(Items.titanium, 2, Items.metaglass, 1, Items.silicon, 1));
-            liquidCapacity = 40f;
-            liquidPressure = 1.025f;
-            health = 90;
-            explosivenessScale = 0.4f;
-            flammabilityScale = 0.4f;
-            researchCost = with(Items.titanium, 80, Items.metaglass, 80, Items.silicon, 80);
         }};
 
         loadTechTree();
