@@ -3,6 +3,7 @@
 .gradle/
 build/
 out/
+.venv/
 .DS_Store
 Thumbs.db
 
