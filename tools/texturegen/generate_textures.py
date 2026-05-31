@@ -56,10 +56,15 @@ def draw_router_top(image: Image.Image, blocked: str | None = None) -> Image.Ima
     cy = image.height * scale / 2
 
     if blocked is not None:
-        y = cy - 13 * scale if blocked == "up" else cy + 13 * scale
+        positions = {
+            "right": (cx + 13 * scale, cy),
+            "up": (cx, cy - 13 * scale),
+            "down": (cx, cy + 13 * scale),
+        }
+        x, y = positions[blocked]
 
         for color, width in ((SHADOW, 3 * scale), (WHITE, 2 * scale)):
-            draw_x(draw, cx, y, 3.2 * scale, color, width)
+            draw_x(draw, x, y, 3.2 * scale, color, width)
 
     return big.resize(image.size, Image.Resampling.LANCZOS)
 
@@ -151,10 +156,12 @@ def main() -> None:
     composite_router("lead-directed-router.png")
     composite_router("lead-right-directed-router.png", "up")
     composite_router("lead-left-directed-router.png", "down")
+    composite_router("lead-t-directed-router.png", "right")
     composite_junction("lead-directed-junction.png")
     composite_router("silicon-directed-router.png", hue=SILICON_HUE)
     composite_router("silicon-right-directed-router.png", "up", hue=SILICON_HUE)
     composite_router("silicon-left-directed-router.png", "down", hue=SILICON_HUE)
+    composite_router("silicon-t-directed-router.png", "right", hue=SILICON_HUE)
     composite_junction("silicon-directed-junction.png", hue=SILICON_HUE)
     composite_instant_blocks()
 
@@ -162,20 +169,24 @@ def main() -> None:
         "lead-directed-router.png",
         "lead-right-directed-router.png",
         "lead-left-directed-router.png",
+        "lead-t-directed-router.png",
         "lead-directed-junction.png",
         "lead-directed-router-top.png",
         "lead-right-directed-router-top.png",
         "lead-left-directed-router-top.png",
+        "lead-t-directed-router-top.png",
         "lead-directed-junction-top.png",
         "silicon-router.png",
         "silicon-junction.png",
         "silicon-directed-router.png",
         "silicon-right-directed-router.png",
         "silicon-left-directed-router.png",
+        "silicon-t-directed-router.png",
         "silicon-directed-junction.png",
         "silicon-directed-router-top.png",
         "silicon-right-directed-router-top.png",
         "silicon-left-directed-router-top.png",
+        "silicon-t-directed-router-top.png",
         "silicon-directed-junction-top.png",
     ):
         print(OUT / name)

@@ -18,8 +18,8 @@ public class M2Blocks{
     public static Block leadArmoredConveyor, siliconArmoredConveyor;
     public static Block leadPlatedConduit, siliconPlatedConduit;
     public static Block siliconInstantRouter, siliconInstantJunction;
-    public static Block leadDirectedRouter, leadRightDirectedRouter, leadLeftDirectedRouter, leadDirectedJunction;
-    public static Block siliconDirectedRouter, siliconRightDirectedRouter, siliconLeftDirectedRouter, siliconDirectedJunction;
+    public static Block leadDirectedRouter, leadRightDirectedRouter, leadLeftDirectedRouter, leadTDirectedRouter, leadDirectedJunction;
+    public static Block siliconDirectedRouter, siliconRightDirectedRouter, siliconLeftDirectedRouter, siliconTDirectedRouter, siliconDirectedJunction;
 
     public static void load(){
         leadArmoredConveyor = new ArmoredConveyor("lead-armored-conveyor"){{
@@ -83,6 +83,12 @@ public class M2Blocks{
             buildCostMultiplier = 4f;
         }};
 
+        leadTDirectedRouter = new DirectedRouter("lead-t-directed-router"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 3));
+            outputs(1, -1);
+            buildCostMultiplier = 4f;
+        }};
+
         leadDirectedJunction = new DirectedJunction("lead-directed-junction"){{
             requirements(Category.distribution, with(Items.copper, 3, Items.lead, 3));
             speed = 26;
@@ -108,6 +114,12 @@ public class M2Blocks{
             buildCostMultiplier = 4f;
         }};
 
+        siliconTDirectedRouter = new InstantDirectedRouter("silicon-t-directed-router"){{
+            requirements(Category.distribution, with(Items.copper, 3, Items.lead, 3, Items.silicon, 3));
+            outputs(1, -1);
+            buildCostMultiplier = 4f;
+        }};
+
         siliconDirectedJunction = new InstantDirectedJunction("silicon-directed-junction"){{
             requirements(Category.distribution, with(Items.copper, 3, Items.lead, 3, Items.silicon, 3));
             health = 30;
@@ -123,12 +135,14 @@ public class M2Blocks{
         addTechNode(Blocks.router, leadDirectedRouter, Seq.with(new SectorComplete(SectorPresets.groundZero)));
         addTechNode(leadDirectedRouter, leadRightDirectedRouter, null);
         addTechNode(leadDirectedRouter, leadLeftDirectedRouter, null);
+        addTechNode(leadDirectedRouter, leadTDirectedRouter, null);
         addTechNode(Blocks.junction, leadDirectedJunction, Seq.with(new SectorComplete(SectorPresets.groundZero)));
         addTechNode(Blocks.router, siliconInstantRouter, null);
         addTechNode(Blocks.junction, siliconInstantJunction, null);
         addTechNode(leadDirectedRouter, siliconDirectedRouter, null);
         addTechNode(leadRightDirectedRouter, siliconRightDirectedRouter, null);
         addTechNode(leadLeftDirectedRouter, siliconLeftDirectedRouter, null);
+        addTechNode(leadTDirectedRouter, siliconTDirectedRouter, null);
         addTechNode(leadDirectedJunction, siliconDirectedJunction, null);
         addTechNode(Blocks.conduit, leadPlatedConduit, null);
         addTechNode(Blocks.pulseConduit, siliconPlatedConduit, null);
